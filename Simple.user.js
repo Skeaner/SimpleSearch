@@ -1,55 +1,16 @@
 // ==UserScript==
 // @name         极简划词搜索
-// @description  超小尺寸悬浮窗，支持划词搜索、复制、打开链接；拖拽链接/图片保存；预定义六组高亮样式（可自定义），动态添加关键词增量高亮，无闪烁；自动高亮默认关闭，加粗样式默认注释；工具栏默认手动隐藏；可配置显示的搜索引擎；可调整按钮顺序；可全局开启/关闭高亮功能；极致性能优化
+// @description  超小尺寸悬浮窗，支持划词搜索、复制、打开链接；预定义六组高亮样式（可自定义），动态添加关键词增量高亮，无闪烁；自动高亮默认关闭，加粗样式默认注释；工具栏默认手动隐藏；可配置显示的搜索引擎；可调整按钮顺序；可全局开启/关闭高亮功能；极致性能优化
 // @icon         https://www.baidu.com/favicon.ico
-// @namespace    http://tampermonkey.net/
-// @version      2.5.2
-// @author       ddrwin
+// @namespace    com.github.skeaner
+// @version      1.0.0
+// @author       Skeaner
 // @license      MIT
 // @match        *://*/*
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @note         2026.2.7  V1.0 初始版本
-// @note         2026.2.8  V1.1 增加打开按钮，优化样式
-// @note         2026.2.9  V1.2 增加拖拽搜索功能，修复状态残留bug
-// @note         2026.2.10 V1.3 修复点击复制按钮误触拖拽搜索的问题
-// @note         2026.2.11 V1.4 增加链接拖拽打开功能
-// @note         2026.2.12 V1.5 增加图片拖拽打开功能
-// @note         2026.2.13 V1.6 增加小红书搜索引擎
-// @note         2026.2.14 V1.7 修复操作后未清除文本选中的问题
-// @note         2026.2.15 V1.8 性能优化：缓存元素检测结果，减少DOM操作，调整搜索引擎顺序
-// @note         2026.2.16 V1.9 性能大优化：使用Element.closest、raf节流、文档片段构建、快速空选返回
-// @note         2026.2.17 V2.0 修复拖拽搜索误触及按钮点击错乱：仅当鼠标按下在选中区域内才触发拖拽，按钮事件改用直接绑定
-// @note         2026.2.21 V2.0.2 优化URL识别逻辑，兼容不带协议的域名路径，增强特殊字符支持（基于v2.0.2beta1改进）
-// @note         2026.2.26  V2.0.3 添加图片拖拽下载保存
-// @note         2026.2.26  V2.0.4 改进图片下载兼容性：增加跨域处理和多级回退，控制台输出提示
-// @note         2026.2.28  V2.0.5 图片保存时自动以当前时间重命名，时间格式调整为 YYYY.MM.DD~HH·MM·SS，添加详细注释
-// @note         2026.3.1  V2.1 事件注册统一管理；搜索引擎列表配置化，方便未来扩展（如 Bing）
-// @note         2026.3.2  V2.1.1 增强图片下载：增加 CORS 代理重试机制、更完善的请求头，提升跨域图片保存成功率
-// @note         2026.3.2  V2.1.2 工具模块拆分（UrlUtils）、使用可选链和空值合并简化代码、代理请求封装为独立函数
-// @note         2026.3.3  V2.2.0 新增高亮按钮，支持页面内关键词高亮（最多5词，红/绿/蓝/紫/橙字黄底）；增加工具栏消失模式开关（auto/manual）；高亮操作异步分批处理，解决卡顿；可配置消失延迟
-// @note         2026.3.3  V2.2.1 采用用户提供的五组预定义关键词及样式；高亮更新改为增量模式，已有高亮保持不变，消除闪烁；动态添加关键词按五色循环分配样式
-// @note         2026.3.3  V2.2.2 修复预定义关键词未自动高亮的问题；增加 MutationObserver 监听页面变化，动态内容自动高亮
-// @note         2026.3.3  V2.2.3 增加自动高亮开关（默认关闭）；加粗样式默认注释；工具栏消失模式默认改为手动；优化 MutationObserver 防抖
-// @note         2026.3.3  V2.2.4 重新排列高亮组颜色（科普/硬件/人工智能颜色互换）；修复自动高亮开关未完全生效的问题；更换高亮图标
-// @note         2026.3.3  V2.2.5 再次修正自动高亮开关：仅在开启时加载预定义关键词；清空所有分组关键词数组；更换太阳图标
-// @note         2026.3.3  V2.2.6 分组名称改为颜色描述；再次修正太阳图标；点击高亮后工具栏立即消失
-// @note         2026.3.3  V2.2.7 更换高亮图标为用户指定版本；交换复制和高亮按钮位置
-// @note         2026.3.3  V2.2.8 增加工具栏偏移开关：可设置左移/下移多少个图标位置（基于按钮实际尺寸）
-// @note         2026.3.3  V2.2.9 修复偏移量在后续划词中失效的问题（强制重排）；高亮按钮放回复制左侧
-// @note         2026.3.5  V2.3.0 彻底修复偏移量失效问题：计算位置前先设置 display:flex；优化代码结构；重新调整高亮组顺序
-// @note         2026.3.7  V2.3.6 移除百度域名特殊逻辑，搜索引擎全局统一配置；重新排列高亮颜色顺序（红/绿/蓝/菊红/紫/深绿）；代码全面注释
-// @note         2026.3.7  V2.3.7 改用 GM_setValue/GM_getValue 实现跨域配置共享；彻底移除域名过滤
-// @note         2026.3.7  V2.3.8 高亮添加防抖；设置面板边界优化；常量分组；代码精简
-// @note         2026.3.7  V2.3.9 修复今日头条搜索页设置面板样式丢失问题：使用 Shadow DOM 封装面板，实现样式隔离；同步高亮颜色名称
-// @note         2026.3.7  V2.4.0 新增必应、抖音、新浪搜索引擎；调整顺序为必应、百度、新浪、头条、抖音、小红书；设置面板双列布局；保存按钮改为 #008373 白字
-// @note         2026.3.7  V2.4.1 调整按钮顺序：当选中文本为 URL 时，"打开"按钮置于最左侧（高亮和复制之前）
-// @note         2026.3.7  V2.4.2 增加"启用高亮功能"开关；代码优化：合并重复样式、精简函数、缓存正则、减少代码量
-// @note         2026.4.8  V2.4.3 添加bilibili、豆瓣、知乎和 GitHub 搜索引擎；设置面板自适应双列布局自动换行
-// @note         2026.5.9  V2.5.1 增加图标显示/隐藏开关；添加自定义搜索引擎功能（增删改、GM存储持久化）
-// @note         2026.5.19 V2.5.2 修复添加自定义搜索引擎时重置内置引擎复选框状态的bug
-// @downloadURL https://update.greasyfork.org/scripts/566626/%E6%9E%81%E7%AE%80%E5%88%92%E8%AF%8D%E6%90%9C%E7%B4%A2.user.js
-// @updateURL https://update.greasyfork.org/scripts/566626/%E6%9E%81%E7%AE%80%E5%88%92%E8%AF%8D%E6%90%9C%E7%B4%A2.meta.js
+// @downloadURL https://raw.githubusercontent.com/Skeaner/SimpleSearch/refs/heads/master/Simple.user.js
+// @updateURL https://raw.githubusercontent.com/Skeaner/SimpleSearch/refs/heads/master/Simple.user.js
 // ==/UserScript==
 
 (function() {
@@ -77,16 +38,18 @@
 
     // ==================== 内置搜索引擎列表 ====================
     const ALL_SEARCH_ENGINES = [
-        { name: '必应', icon: '🔍', url: 'https://www.bing.com/search?q=%s' },
-        { name: '百度', icon: '🔍', url: 'https://www.baidu.com/s?wd=%s' },
-        { name: '知乎', icon: '🔍', url: 'https://www.zhihu.com/search?type=content&q=%s' },
-        { name: 'GitHub', icon: '🔍', url: 'https://github.com/search?q=%s&type=repositories' },
-        { name: 'bilibili', icon: '🔍', url: 'https://search.bilibili.com/all?keyword=%s' },
-        { name: 'IT之家', icon: '🔍', url: 'https://www.ithome.com/search/%s.html' },
-        { name: '头条', icon: '🔍', url: 'https://www.toutiao.com/search/?keyword=%s' },
-        { name: '抖音', icon: '🔍', url: 'https://www.douyin.com/search/%s' },
+        { name: 'G', icon: '🔍', url: 'https://www.google.com/search?q=%s' },
+        { name: '百度', icon: '🔍', url: 'https://www.baidu.com/s?wd=%s&ie=utf-8' },
+        { name: '百科', icon: '🔍', url: 'https://baike.baidu.com/item/%s' },
+        { name: '维基', icon: '🔍', url: 'https://zh.wikipedia.org/w/index.php?search=%s' },
         { name: '豆瓣', icon: '🔍', url: 'https://www.douban.com/search?q=%s' },
-        { name: '小红书', icon: '🔍', url: 'https://www.xiaohongshu.com/search_result?keyword=%s' }
+        { name: '翻译', icon: '🔍', url: 'https://fanyi.baidu.com/#auto/auto/%s' },
+        { name: '小红书', icon: '🔍', url: 'https://www.xiaohongshu.com/search_result?keyword=%s' },
+        { name: '抖音', icon: '🔍', url: 'https://www.douyin.com/search/%s' },
+        { name: '京东码', icon: '🔍', url: 'https://item.jd.com/%s.html' },
+        { name: '京东搜', icon: '🔍', url: 'https://search.jd.com/Search?keyword=%s' },
+        { name: '高德地图', icon: '🔍', url: 'https://www.amap.com/search?query=%s' },
+        { name: '百度地图', icon: '🔍', url: 'https://map.baidu.com/search/?querytype=s&wd=%s' }
     ];
 
     // 从全局存储加载配置

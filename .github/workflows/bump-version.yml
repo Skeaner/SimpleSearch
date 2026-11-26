@@ -1,0 +1,53 @@
+name: Auto Bump UserScript Version
+
+on:
+  push:
+    branches:
+      - main  # 如果你的主分支是 master，请改为 master
+    paths:
+      - '**.user.js'  # 仅当 .user.js 文件发生修改并推送时才触发
+
+permissions:
+  contents: write  # 赋予 Actions 修改并推送代码回仓库的权限
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    # 防止 Actions 自己提交的 commit 再次触发无限循环
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Bump @version in .user.js
+        run: |
+          node -e '
+            const fs = require("fs");
+            const filePath = "Simple.user.js"; 
+            let content = fs.readFileSync(filePath, "utf8");
+
+            // 匹配 // @version x.y.z 格式并递增最后一位修订号 (Patch)
+            const updated = content.replace(
+              /^(\/\/\s*@version\s+)(\d+)\.(\d+)\.(\d+)(.*)$/m,
+              (_, prefix, major, minor, patch, suffix) => {
+                const nextPatch = Number(patch) + 1;
+                console.log(`Version bumped: ${major}.${minor}.${patch} -> ${major}.${minor}.${nextPatch}`);
+                return `${prefix}${major}.${minor}.${nextPatch}${suffix}`;
+              }
+            );
+
+            if (content === updated) {
+              console.error("未找到符合 x.y.z 格式的 @version 字段");
+              process.exit(1);
+            }
+            fs.writeFileSync(filePath, updated, "utf8");
+          '
+
+      - name: Commit and push updated version
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git commit -m "chore: bump userscript version [skip ci]"
+          git push
