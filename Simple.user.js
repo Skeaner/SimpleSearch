@@ -3,7 +3,7 @@
 // @description  超小尺寸悬浮窗，支持划词搜索、复制、打开链接；预定义六组高亮样式（可自定义），动态添加关键词增量高亮，无闪烁；自动高亮默认关闭，加粗样式默认注释；工具栏默认手动隐藏；可配置显示的搜索引擎；可调整按钮顺序；可全局开启/关闭高亮功能；极致性能优化
 // @icon         https://www.baidu.com/favicon.ico
 // @namespace    com.github.skeaner
-// @version      1.0.0
+// @version      1.0.1
 // @author       Skeaner
 // @license      MIT
 // @match        *://*/*
