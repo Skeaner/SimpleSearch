@@ -1,0 +1,60 @@
+{
+  "fieldsets": [
+    {
+      "name": "Google",
+      "url": "https://www.google.com/search?q=%s"
+    },
+    {
+      "name": "百度",
+      "url": " https://www.baidu.com/s?wd=%s&ie=utf-8"
+    },
+    {
+      "name": "百度百科",
+      "url": "https://baike.baidu.com/item/%s"
+    },
+    {
+      "name": "维基百科",
+      "url": "https://zh.wikipedia.org/w/index.php?search=%s"
+    },
+    {
+      "name": "豆瓣",
+      "url": " https://movie.douban.com/subject_search?search_text=%s"
+    },
+    {
+      "name": "百度翻译",
+      "url": "https://fanyi.baidu.com/#auto/auto/%s"
+    },
+    {
+      "name": "谷歌翻译",
+      "url": "https://translate.google.com/?q=%s"
+    },
+    {
+      "name": "小红书",
+      "url": "https://www.xiaohongshu.com/search_result?keyword=%s"
+    },
+    {
+      "name": "抖音",
+      "url": "https://www.douyin.com/search/%s"
+    },
+    {
+      "name": "京东商品编码",
+      "url": "https://item.jd.com/%s.html"
+    },
+    {
+      "name": "京东关键字",
+      "url": "https://search.jd.com/Search?keyword=%s"
+    },
+    {
+      "name": "TMDB",
+      "url": "https://www.themoviedb.org/search?query=%s"
+    },
+    {
+      "name": "高德地图",
+      "url": "https://www.amap.com/search?query=%s"
+    },
+    {
+      "name": "百度地图",
+      "url": "https://map.baidu.com/search/?querytype=s&wd=%s"
+    }
+  ]
+}
