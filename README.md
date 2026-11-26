@@ -1,0 +1,1 @@
+[![一键安装](https://img.shields.io/badge/点击安装-Tampermonkey-brightgreen.svg)](https://github.com/Skeaner/SimpleSearch/raw/refs/heads/master/Simple.user.js)

@@ -34,20 +34,35 @@
         { name: "深绿底白字", keywords: [], style: "background-color:#008373; color:#FFFFFF; /* font-weight:bold; */" }
     ];
 
+    // ==================== 引擎图标配置（统一在此填入 Base64，留空则回退默认图标，可复用） ====================
+    const ENGINE_ICONS = {
+        google: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAA5FBMVEVHcEz9SlD/TkL/RUH/RUD/RkP4gyr/SUX/Rj//SE3/Yjb/UDn/Szz9TFb/Yi7/WTT8TVn/cyf/Zi7/iRz/fSL/lRb/SEjeuwX/qQ7/nhP/tgv9TFX6yQj/wwn/zAffugr8zgb+zwnzzQb4ywkvhv82qo79zgQek+ApjurzzAPlywIvhv0qifjRyQEth/y5yAKnxwAoivaMxQUak94fj+hzxAtawxdawhgLpa4OncYVltc8wCobvFIMuWgHqp0KorWaxQEnvz4bvUwPumUNumQMumgIr4wIqaIRvFoNu2MKtnRJwh6BPIl6AAAATHRSTlMAWZDK7P8Orf//Gv///+b/5P7////4dor///8qmP/9K0j/tu7/DeYwRP//HWr/rv///v/b///+HMT///+XTvD/5f//yGzw///////mXfQ9oAAAAWBJREFUeAF0z1UCgCAQRdEZ7O7u/W9STPr93oMCcENi2Y5jWwRBM9fz7zl0QeCFcidRHLMeJAkRj6dZdom/0+Uu62FRlpcQQILsfFVfIrqE/wPWoWleEXstYutdgO9dP9wi++/VCt0dx0dwL5u4DvNyiaFywbB1WS6ymfp+rJSMM5g2H7fYjOCsi5wOIAiCKNhRnG1bazv/fG7erFW/VcNezFEsKWVVZk2bOVi0BVuawE9GbcGOJrxoD3DEZD5ZtAcLdsX9vvWSW/ZM5g+H7JnHhFMcsI+CPpwXVOGSBsT8+Xy9VX5qfQerC77yDP94rEvB8/VCscO4z1f49+db8D9BFJEQ6N64/0hyqhVV03hxIo7+eMNLhmnZimLLjut6msCKZ3qhR+wN0/f9IAjD0PV4kV3rW/QoXF5sC4+KcEAShMkWzBeQ+QaFLX5rKrOWzcQjsHbUgCJbThA4lmwXVv8BPaBVEHC66TMAAAAASUVORK5CYII=',      // 示例: 'data:image/png;base64,...'
+        baidu: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAb1BMVEX///+7vfNna+fHyPXW1/cAAN4fKeDx8vyQk+wcJ+ApMuEPHuAJGt/IyvX7/P6rrfDs7fwAE98/RuPe3/l/gurV1vdwdOh5femxs/Gcnu63uPJgZOZ0eOmLjuw3PuKFiOvv7/xXXOWvsfGmqPBZXuUVxkiOAAAA2ElEQVR4Ac2PxQHDMBAE17CGk0kUMIb6bzHwMhaQEWsEd/hjgjACojA4cjETpum3iw9klouKIiV5diyLsiwOZFXHDZWuKq3YxHW1kqagbeoG+HaWhVk6qyV3vwd+V1wu2i6k15KcgDN5Bk6JaI8FoniB0yLK4UIlWJJeWwTsjIgO0F5TbGhJZCoRtgdpsuurIexyNw5bNzBChSluiYEbe+OIO6vJX5gOOW8rWRaCnunk258sypVsqB6/x5+/LmeDFb3W4/0uNPfXqHtsqLvOPbx/uK6r8a98AHl4DLrdn11VAAAAAElFTkSuQmCC"',       // 百度（百科 / 翻译 / 百度地图留空时也会默认复用此图标）
+        baike: '',       // 百度百科（留空则复用 baidu）
+        wiki: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAAnklEQVR4AeTNIQiDQABG4b+u17X1aF6PK3YEO9iMJqPVau82y4FgMezS0oVLhqsHtrcqeqzDXv3CEz/6L4yTtZM3dnHmPTtjzXZAXKYVo4agkU2GI2Lloc6JDez1+flswMu1EQZ3xlE7lK8eKDkjtwE+crBMV+wesKmCiisGGepZIfQJpMj9SNb2MYWrChjVkULuCyCfRvsdmBieyQQAsoDk/9ryhFMAAAAASUVORK5CYII=',        // 维基百科
+        douban: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAOVBMVEUAdxEAdxEAdQEAcABMmFSmw6iSvpf///8qgS8AbgDA1cKt0LHv9/DY6tsAaACPxZfE2sZ9rYHE2MaFXlqtAAAAAXRSTlNbvF9QGgAAALBJREFUeAGE0QUCQEAURVE/zJsW+1+s0c3VjlZV9Npmj43I8hDPyFo/pDyhGDxk5B/JPsYzMj/SjOQ8Lnm3YwBi2opAOGPQrXBD43jJmTsKLckDZlnKd0zNVntCCTh1xs5HIPVtqU9A9J1sSJLHu/LUeMdcbENiBfz4zdh6QJlOaCOSjqgJ0R5Qcs7jA3e51I1PU5Yyo9R4qJZ/5K73t/pu/dnuId6fdhgWQEgSb3YAAIPcDyRUg4uBAAAAAElFTkSuQmCC',      // 豆瓣
+        fanyi: '',       // 百度翻译（留空则复用 baidu）
+        xiaohongshu: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAh1BMVEX/JEL+JUT5JEP/AC3/Ejj/GTv/IkH/HT7/AC//ATL/CjT/3+L/l5//eIP/7vH/ZHX/b37/Q1j/U2f/0dX/wMb/aXn/TmH/////q7H/ACX/5+n/AAD/kJr/4ub/vMH/+fr//P3/o6r/W2v/sbb/ABv/mqH/M0z/s7n/PVL/pq3/fYr/ACD/y89pi0ncAAAA+UlEQVR4AbSNVWKFMBAAgU0ggtvi7nD/69VCvf18E8+saC/ouqH9wNB1dVHnT9TvX0rp//Lu3H+cSjX+dUo9DiAvGwXTotSyGKemZX44IW2iUcfVPN8PwihOrDS4LQWGGbC8iEsXsYoQUdaNUM5vadf3xYBtRtqRQB1XyIlKJBVOXT/jsuIG7b40bRFhdjcVO5Zdf2AetceLTFvsXBdXoeTqlt3u4RJJf2r7s5RxWdYxf5PWsFe459dwreGFRXMWV9q3Sr5Y1svFyld3Xou6iPJrJIVMLe2GwEt7AUIAANO4MAGs59EuxPFGNt5kgjeB4Uua+BM13uwAAEymEb6jFNmeAAAAAElFTkSuQmCC', // 小红书
+        douyin: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAIAAAD9b0jDAAABaklEQVR4Ae2TM2BdARSGT23btrvUtpa6XeommbLE2bLEyRrbtm3btm2fnOf3Yvu71n/0X1hiVslOgsQIxv7EYZgqNmAHInbTJqO+B6aItdiKLHKKRKZclMiyd516USKitBgU5ODF46kUZfXXwz/wD6yYCtHMfJ6wf6QpnIGxQnX5ukJlPmmdgfUCord+2nwXIjmsa0T3oDGLGmoBdqtjVx0yufpdQPSdKADsAVCDXWEbb8rtvgCjQ+3H7uy+HiSGEd0zgd4F93YiQdUp65LVJytKab7ubuYmSNVdZ1Y6OVF7C2PsQiI8oRLuAYvJi7Jrj0uzhKPAZesW/umPU1RG3I1MzSTw2Xf+YLy2bHsF40W2pQ45fDbSY5ghMYLSZPmBjMlry7iS7UYe0YiUO/sO+eHEB4YxJ8A3KQkcRF9VLcsPMGE+HzjdZOHE+M1zimhoZFhqpduB2zB5JGCDK1ykVXPN+etrt8JssUQ/ojyGpDQgIdwAAAAASUVORK5CYII=',      // 抖音
+        jd: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAgVBMVEVHcEz/CAD/BAD/BAD/BAD/BAD/AAD/Dgv5OTf/UlH/Liz9v77+4OD/dHT8rq7////6+Pj+0tH/hoX/mZjz8fH9/Pxvb2/IyMi3t7eXl5cAAABPT09+fn7Nzc2goKCqqqrb29vp6OhiYmIHBweJiYn7ZWM+Pj71AAD5o6L6kI/tDQLbTYDHAAAABnRSTlMABI3i/yZvWrP2AAABY0lEQVR4AX2TBZaDQBBEG+t4anD3+P0PuJNG3mTt4/CBkWoismzH/RXHtkjjuf/gEVnuv1hk/y/YZP6fhc92kNydH262u912lhaReH84nph5dz5iQvmB8SnaQxOeIqwgBsKz3sSgI35HAae3QYCK/zBi5regIgUhSbGSpYhj+QmpaP59XpRYKQsFBTAbQlJU0NRN273tev4ERb2CUA+xvDqOxQVx2c+t0EIMg6YoijFdOxKYQgeh72WvRFBvAbNfwKCIRMCVVH/ERDtgJa8wCSHF2xAzl1u0nmEWdrS5b7GQjkNb11lVNNBo+3hlYvfuY6VrqipPIcjEu+S6vMVvHNiVydIbB/iJWvIgUQt/PpfXRRDjGuMDf40mLXF9GIo6yXNDkMw+n4/H+fx4Pp9mstfY6/Bet6/7/b49hWzG3p6fnz56aBSONbcSJo/VsKbiZY6B2Mj9htfilfKXHyhDCHkp/y9f+jDZxYTJwAAAAABJRU5ErkJggg==',          // 京东（京东码 / 京东搜复用）
+        amap: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAwFBMVEVHcEzP5tSw6YW45oH/0Gip6oKv6IHC7Z/////y8ezz7+jy8eyz6Ie95H3/zWGu6X7z8Ovy8Ov18u399uzh4d7p7e7y8OvC2fRmpOEAhe9CofZvt+/C75QlmPkAjf4AguUAkf62z+sAk/4Alf8Ae9udyP8Abcf/1F7x8vKQvvH27NrSx4sAYLi/uI2jyf/c2dLpvFr65pbl2I6OkI//6ZL/3kGonoUAUKwAQ5tncnj744f7zGXCqnVWcpvn0HSmy//bkwjQAAAAQHRSTlMAIaXt///////34JyX/////3//////jP////////////////////////v///////////////////////////+T80zBKgAAAWFJREFUeAFt0oWWgzAQQNHUvc3iGlKk7u79/7/amUFWH849OAwqlStVqFbHGs1mq9Vqd0qM6tbrvX6OA0BOfWRWIFQgaqle//dIqMTK9X+OVFRN59xglX+OVE3LVjlvs/rfI03Htl3AFhtgKdKqZ/oisOVQQWxQiLTihiKKg0joiqK0WBNTEWGZCBlGoyCSfhP7wvHEFSIMQ7BQTFPk2Kw/nltwVBiJBVhIl+QtQmW2dIDAbLJQ6JwQbeUjgQVokK/mqNBRaHFmclogn01DiTZaxGShMJUCFW1tyUgWRpcknEB8vVn6i8Kko06wFttiu81mXxhc8rCl2JHabE6Lsy1TFPNjWoZVwMt1KYnFMccb1b8/zs/X64WvSTq7LNaeQLN+dfPU1tDQF9JdJdSUdTgEeL/rGvFUTFdpb1bKsFqdwIrCeVNPMiwxZnxH4GazOJCB/otkUKnTRmxRHP4HpBLAJ7EvSb1z5OdPAAAAAElFTkSuQmCC',        // 高德地图
+        baiduMap: ''     // 百度地图（留空则复用 baidu）
+    };
+
     // ==================== 内置搜索引擎列表 ====================
     const ALL_SEARCH_ENGINES = [
-        { name: 'G', icon: '🔍', url: 'https://www.google.com/search?q=%s' },
-        { name: '百度', icon: '🔍', url: 'https://www.baidu.com/s?wd=%s&ie=utf-8' },
-        { name: '百科', icon: '🔍', url: 'https://baike.baidu.com/item/%s' },
-        { name: '维基', icon: '🔍', url: 'https://zh.wikipedia.org/w/index.php?search=%s' },
-        { name: '豆瓣', icon: '🔍', url: 'https://www.douban.com/search?q=%s' },
-        { name: '翻译', icon: '🔍', url: 'https://fanyi.baidu.com/#auto/auto/%s' },
-        { name: '小红书', icon: '🔍', url: 'https://www.xiaohongshu.com/search_result?keyword=%s' },
-        { name: '抖音', icon: '🔍', url: 'https://www.douyin.com/search/%s' },
-        { name: '京东码', icon: '🔍', url: 'https://item.jd.com/%s.html' },
-        { name: '京东搜', icon: '🔍', url: 'https://search.jd.com/Search?keyword=%s' },
-        { name: '高德地图', icon: '🔍', url: 'https://www.amap.com/search?query=%s' },
-        { name: '百度地图', icon: '🔍', url: 'https://map.baidu.com/search/?querytype=s&wd=%s' }
+        { name: 'G', icon: ENGINE_ICONS.google, url: 'https://www.google.com/search?q=%s' },
+        { name: '百度', icon: ENGINE_ICONS.baidu, url: 'https://www.baidu.com/s?wd=%s&ie=utf-8' },
+        { name: '百科', icon: ENGINE_ICONS.baike || ENGINE_ICONS.baidu, url: 'https://baike.baidu.com/item/%s' },
+        { name: '维基', icon: ENGINE_ICONS.wiki, url: 'https://zh.wikipedia.org/w/index.php?search=%s' },
+        { name: '豆瓣', icon: ENGINE_ICONS.douban, url: 'https://www.douban.com/search?q=%s' },
+        { name: '翻译', icon: ENGINE_ICONS.fanyi || ENGINE_ICONS.baidu, url: 'https://fanyi.baidu.com/#auto/auto/%s' },
+        { name: '小红书', icon: ENGINE_ICONS.xiaohongshu, url: 'https://www.xiaohongshu.com/search_result?keyword=%s' },
+        { name: '抖音', icon: ENGINE_ICONS.douyin, url: 'https://www.douyin.com/search/%s' },
+        { name: '京东码', icon: ENGINE_ICONS.jd, url: 'https://item.jd.com/%s.html' },
+        { name: '京东搜', icon: ENGINE_ICONS.jd, url: 'https://search.jd.com/Search?keyword=%s' },
+        { name: '高德地图', icon: ENGINE_ICONS.amap, url: 'https://www.amap.com/search?query=%s' },
+        { name: '百度地图', icon: ENGINE_ICONS.baiduMap || ENGINE_ICONS.baidu, url: 'https://map.baidu.com/search/?querytype=s&wd=%s' }
     ];
 
     // 从全局存储加载配置
@@ -170,7 +185,6 @@
         highlight: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij48cGF0aCBkPSJNMTIgMjEuMzVsLTEuNDUtMS4zMkM1LjQgMTUuMzYgMiAxMi4yOCAyIDguNSAyIDUuNDIgNC40MiAzIDcuNSAzYzEuNzQgMCAzLjQxLjgxIDQuNSAyLjA5QzEzLjA5IDMuODEgMTQuNzYgMyAxNi41IDMgMTkuNTggMyAyMiA1LjQyIDIyIDguNWMwIDMuNzgtMy40IDYuODYtOC41NSAxMS41NEwxMiAyMS4zNXoiIGZpbGw9IiNlNzRjM2MiLz48L3N2Zz4=',
         settings: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij48cGF0aCBkPSJNMTkuMTQgMTIuOTRjLjA0LS4zLjA2LS42MS4wNi0uOTQgMC0uMzItLjAyLS42NC0uMDctLjk0bDIuMDMtMS41OGMuMTgtLjE0LjIzLS40MS4xMi0uNjFsLTEuOTItMy4zMmMtLjEyLS4yMi0uMzctLjI5LS41OS0uMjJsLTIuMzkuOTZjLS41LS4zOC0xLjAzLS43LTEuNjItLjk0bC0uMzgtMi41NGMtLjAzLS4yNC0uMjQtLjQyLS40OC0uNDJoLTMuODRjLS4yNCAwLS40NS4xOC0uNDguNDJsLS4zOCAyLjU0Yy0uNTkuMjQtMS4xMy41Ny0xLjYyLjk0bC0yLjM5LS45NmMtLjIyLS4wOC0uNDcgMC0uNTkuMjJMMi43NCA4Ljg3Yy0uMTIuMjEtLjA4LjQ3LjEyLjYxbDIuMDMgMS41OGMtLjA1LjMtLjA5LjYzLS4wOS45NHMwLjAyLjY0LjA3Ljk0bC0yLjAzIDEuNThjLS4xOC4xNC0uMjMuNDEtLjEyLjYxbDEuOTIgMy4zMmMuMTIuMjIuMzcuMjkuNTkuMjJsMi4zOS0uOTZjLjUuMzggMS4wMy43IDEuNjIuOTRsLjM4IDIuNTRjLjAzLjI0LjI0LjQyLjQ4LjQyaDMuODRjLjI0IDAgLjQ1LS4xOC40OC0uNDJsLjM4LTIuNTRjLjU5LS4yNCAxLjEzLS41NiAxLjYyLS45NGwyLjM5Ljk2Yy4yMi4wOC40NyAwIC41OS0uMjJsMS45Mi0zLjMyYy4xMi0uMjIuMDctLjQ3LS4xMi0uNjFsLTIuMDEtMS41OE0xMiAxNS42Yy0xLjk4IDAtMy42LTEuNjItMy42LTMuNnMxLjYyLTMuNiAzLjYtMy42IDMuNiAxLjYyIDMuNiAzLjYtMS42MiAzLjYtMy42IDMuNnoiIGZpbGw9IiMzMzMiLz48L3N2Zz4='
     };
-    ALL_SEARCH_ENGINES.forEach(e => e.icon = ICONS.search);
 
     // ==================== 设置面板（Shadow DOM）====================
     let settingsPanelHost, settingsPanelRoot;
@@ -438,7 +452,15 @@
             btns.push(copyBtn);
         }
 
-        getEnabledEngines().forEach(e => btns.push({ icon: e.icon, text: e.name, noIcon: !showEngineIcons, handler: () => { open(e.url.replace(/%s|\{keyword\}|\{searchTerms\}|\$\{searchTerms\}|\{query\}|%KEYWORD%/i, encodeURIComponent(text))); getSelection().empty(); hideToolbar(); } }));
+        getEnabledEngines().forEach(e => {
+            const icon = (!e.icon || e.icon === '🔍') ? ICONS.search : e.icon;
+            btns.push({
+                icon,
+                text: e.name,
+                keepIconColor: icon !== ICONS.search,
+                handler: () => { open(e.url.replace(/%s|\{keyword\}|\{searchTerms\}|\$\{searchTerms\}|\{query\}|%KEYWORD%/i, encodeURIComponent(text))); getSelection().empty(); hideToolbar(); }
+            });
+        });
         btns.push({ icon: ICONS.settings, text: '', title: '设置', alwaysShowIcon: true, handler: showSettingsPanel });
 
         btns.forEach((btn, i) => {
@@ -457,7 +479,12 @@
                 el.innerHTML = `<span>${btn.text}</span>`;
             }
             el._handler = btn.handler;
-            el.addEventListener('mouseenter', e => { e.currentTarget.style.background = '#f0f0f0'; e.currentTarget.style.color = '#5FE382'; const img = e.currentTarget.querySelector('img'); if (img) img.style.filter = GREEN_FILTER; });
+            el.addEventListener('mouseenter', e => {
+                e.currentTarget.style.background = '#f0f0f0';
+                e.currentTarget.style.color = '#5FE382';
+                const img = e.currentTarget.querySelector('img');
+                if (img && !btn.keepIconColor) img.style.filter = GREEN_FILTER;
+            });
             el.addEventListener('mouseleave', e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#333'; const img = e.currentTarget.querySelector('img'); if (img) img.style.filter = 'none'; });
             frag.appendChild(el);
         });
