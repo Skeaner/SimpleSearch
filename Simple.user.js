@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         极简划词搜索
+// @name         极简划词搜索Mod
 // @description  超小尺寸悬浮窗，支持划词搜索、复制、打开链接；预定义六组高亮样式（可自定义），动态添加关键词增量高亮，无闪烁；自动高亮默认关闭，加粗样式默认注释；工具栏默认手动隐藏；可配置显示的搜索引擎；可调整按钮顺序；可全局开启/关闭高亮功能；极致性能优化
 // @icon         https://www.baidu.com/favicon.ico
 // @namespace    com.github.skeaner
@@ -18,8 +18,6 @@
 
     // ==================== 常量定义 ====================
     const CONFIG = {
-        PROXY_URL: 'https://cors-anywhere.herokuapp.com/',
-        OPEN_WINDOW_AS_FALLBACK: false,
         TOOLBAR_HIDE_MODE: 'manual',
         HIDE_DELAY: 1000,
         AUTO_HIGHLIGHT_ENABLED: false,
@@ -164,18 +162,11 @@
         observer.observe(document.body, { childList: true, subtree: true, characterData: true });
     })();
 
-    // ==================== 辅助函数 ====================
-    const getFormattedDateTime = () => {
-        const d = new Date();
-        return `${d.getFullYear()}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getDate().toString().padStart(2,'0')}~${d.getHours().toString().padStart(2,'0')}·${d.getMinutes().toString().padStart(2,'0')}·${d.getSeconds().toString().padStart(2,'0')}`;
-    };
-
     // ==================== 图标 ====================
     const ICONS = {
         copy: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNjU1Nzc5ODc4NDY4IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjE0MTciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PHN0eWxlIHR5cGU9InRleHQvY3NzIj5AZm9udC1mYWNlIHsgZm9udC1mYW1pbHk6IGZlZWRiYWNrLWljb25mb250OyBzcmM6IHVybCgiLy9hdC5hbGljZG4uY29tL3QvZm9udF8xMDMxMTU4X3U2OXc4eWh4ZHUud29mZjI/dD0xNjMwMDMzNzU5OTQ0IikgZm9ybWF0KCJ3b2ZmMiIpLCB1cmwoIi8vYXQuYWxpY2RuLmNvbS90L2ZvbnRfMTAzMTE1OF91Njl3OHloeGR1LndvZmY/dD0xNjMwMDMzNzU5OTQ0IikgZm9ybWF0KCJ3b2ZmIiksIHVybCgiLy9hdC5hbGljZG4uY29tL3QvZm9udF8xMDMxMTU4X3U2OXc4eWh4ZHUudHRmP3Q9MTYzMDAzMzc1OTk0NCIpIGZvcm1hdCgidHJ1ZXR5cGUiKTsgfQ0KPC9zdHlsZT48L2RlZnM+PHBhdGggZD0iTTM3NyA0MzJoMzQ5YTggOCAwIDAgMSA4IDh2NDhhOCA4IDAgMCAxLTggOEgzNzdhOCA4IDAgMCAxLTgtOHYtNDhhOCA4IDAgMCAxIDgtOHogbTAgMTYwaDI1OGE4IDggMCAwIDEgOCA4djQ4YTggOCAwIDAgMS04IDhIMzc3YTggOCAwIDAgMS04LTh2LTQ4YTggOCAwIDAgMSA4LTh6IG0tNjUtMjgwdjU3Nmg0ODBWMzEySDMxMnogbS00MC03Mmg1NjBjMTcuNjczIDAgMzIgMTQuMzI3IDMyIDMydjY1NmMwIDE3LjY3My0xNC4zMjcgMzItMzIgMzJIMjcyYy0xNy42NzMgMC0zMi0xNC4zMjctMzItMzJWMjcyYzAtMTcuNjczIDE0LjMyNy0zMiAzMi0zMnogbS04OC01NnY2NjRhOCA4IDAgMCAxLTggOGgtNTZhOCA4IDAgMCAxLTgtOFYxNDRjMC0xNy42NzMgMTQuMzI3LTMyIDMyLTMyaDYzMmE4IDggMCAwIDEgOCA4djU2YTggOCAwIDAgMS04IDhIMTg0eiIgZmlsbD0iIzMzMzMzMyIgcC1pZD0iMTQxOCI+PC9wYXRoPjwvc3ZnPg==',
         search: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNjUxNTY3NDk1OTczIiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjIwNzciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+PGRlZnM+PHN0eWxlIHR5cGU9InRleHQvY3NzIj48L3N0eWxlPjwvZGVmcz48cGF0aCBkPSJNNDQ2LjExMjMyMyAxNzcuNTQ1MDUxYzEzNy41Njc2NzcgMC4yMTk3OTggMjUyLjYxMjUyNSAxMDQuNTk3OTggMjY2LjE2MjQyNCAyNDEuNDkzMzMzIDEzLjU2MjgyOCAxMzYuODk1MzU0LTc4Ljc3ODE4MiAyNjEuODE4MTgyLTIxMy42MTc3NzcgMjg5LjAwODQ4NS0xMzQuODUyNTI1IDI3LjIwMzIzMi0yNjguMzg2MjYzLTUyLjE1Njc2OC0zMDguOTQ1NDU1LTE4My42MDg4ODlzMjUuMDE4MTgyLTI3Mi4yNTIxMjEgMTUxLjczODE4Mi0zMjUuNzc5Mzk0QTI2Ny4yMzU1NTYgMjY3LjIzNTU1NiAwIDAgMSA0NDYuMTEyMzIzIDE3Ny41NDUwNTFtMC02Mi4wNjA2MDdjLTE4Mi43OTQzNDMgMC0zMzAuOTg5ODk5IDE0OC4xOTU1NTYtMzMwLjk4OTg5OSAzMzAuOTg5ODk5czE0OC4xOTU1NTYgMzMwLjk4OTg5OSAzMzAuOTg5ODk5IDMzMC45ODk4OTkgMzMwLjk4OTg5OS0xNDguMTk1NTU2IDMzMC45ODk4OTktMzMwLjk4OTg5OS0xNDguMTk1NTU2LTMzMC45ODk4OTktMzMwLjk4OTg5OS0zMzAuOTg5ODk5eiBtNDMxLjMyMTIxMiA3OTMuMzQxNDE1YTMwLjg0OTI5MyAzMC44NDkyOTMgMCAwIDEtMjEuOTQxMDEtOS4xMDIyMjNsLTE1Ny4yMjAyMDItMTU3LjIyMDIwMmMtMTEuNzUyNzI3LTEyLjE3OTM5NC0xMS41ODQ2NDYtMzEuNTM0NTQ1IDAuMzc0OTUtNDMuNTA3MDcgMTEuOTcyNTI1LTExLjk3MjUyNSAzMS4zMjc2NzctMTIuMTQwNjA2IDQzLjQ5NDE0MS0wLjM3NDk1bDE1Ny4yMjAyMDIgMTU3LjIyMDIwMmEzMS4wMzY3NjggMzEuMDM2NzY4IDAgMCAxIDYuNzIzMjMyIDMzLjgxMDEwMSAzMS4wMDQ0NDQgMzEuMDA0NDQ0IDAgMCAxLTI4LjY1MTMxMyAxOS4xNzQxNDJ6IG0wIDAiIHAtaWQ9IjIwNzgiIGZpbGw9IiMzMzMzMzMiPjwvcGF0aD48L3N2Zz4=',
         openLink: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNjUxNTgwNDU1NTcwIiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9Ijk0MiIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cGF0aCBkPSJNODMyIDEyOEg2NDB2NjRoMTQ2Ljc1Mkw1MjEuMzc2IDQ1Ny4zNzZsNDUuMjQ4IDQ1LjI0OEw4MzIgMjM3LjI0OFYzODRoNjRWMTI4eiIgZmlsbD0iIzMzMzMzMyIgcC1pZD0iOTQzIj48L3BhdGg+PHBhdGggZD0iTTc2OCA4MzJIMTkyVjI1NmgzNTJ2LTY0SDE2MGEzMiAzMiAwIDAgMC0zMiAzMnY2NDBhMzIgMzIgMCAwIDAgMzIgMzJoNjQwYTMyIDMyIDAgMCAwIDMyLTMzVjQ4MGgtNjR2MzUyeiIgZmlsbD0iIzMzMzMzMyIgcC1pZD0iOTQ0Ij48L3BhdGg+PC9zdmc+',
-        save: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"%3E%3Cpath fill="%23333" d="M8 12L4 8h3V4h2v4h3l-4 4zM2 14h12v-2H2v2z"/%3E%3C/svg%3E',
         highlight: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij48cGF0aCBkPSJNMTIgMjEuMzVsLTEuNDUtMS4zMkM1LjQgMTUuMzYgMiAxMi4yOCAyIDguNSAyIDUuNDIgNC40MiAzIDcuNSAzYzEuNzQgMCAzLjQxLjgxIDQuNSAyLjA5QzEzLjA5IDMuODEgMTQuNzYgMyAxNi41IDMgMTkuNTggMyAyMiA1LjQyIDIyIDguNWMwIDMuNzgtMy40IDYuODYtOC41NSAxMS41NEwxMiAyMS4zNXoiIGZpbGw9IiNlNzRjM2MiLz48L3N2Zz4=',
         settings: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij48cGF0aCBkPSJNMTkuMTQgMTIuOTRjLjA0LS4zLjA2LS42MS4wNi0uOTQgMC0uMzItLjAyLS42NC0uMDctLjk0bDIuMDMtMS41OGMuMTgtLjE0LjIzLS40MS4xMi0uNjFsLTEuOTItMy4zMmMtLjEyLS4yMi0uMzctLjI5LS41OS0uMjJsLTIuMzkuOTZjLS41LS4zOC0xLjAzLS43LTEuNjItLjk0bC0uMzgtMi41NGMtLjAzLS4yNC0uMjQtLjQyLS40OC0uNDJoLTMuODRjLS4yNCAwLS40NS4xOC0uNDguNDJsLS4zOCAyLjU0Yy0uNTkuMjQtMS4xMy41Ny0xLjYyLjk0bC0yLjM5LS45NmMtLjIyLS4wOC0uNDcgMC0uNTkuMjJMMi43NCA4Ljg3Yy0uMTIuMjEtLjA4LjQ3LjEyLjYxbDIuMDMgMS41OGMtLjA1LjMtLjA5LjYzLS4wOS45NHMwLjAyLjY0LjA3Ljk0bC0yLjAzIDEuNThjLS4xOC4xNC0uMjMuNDEtLjEyLjYxbDEuOTIgMy4zMmMuMTIuMjIuMzcuMjkuNTkuMjJsMi4zOS0uOTZjLjUuMzggMS4wMy43IDEuNjIuOTRsLjM4IDIuNTRjLjAzLjI0LjI0LjQyLjQ4LjQyaDMuODRjLjI0IDAgLjQ1LS4xOC40OC0uNDJsLjM4LTIuNTRjLjU5LS4yNCAxLjEzLS41NiAxLjYyLS45NGwyLjM5Ljk2Yy4yMi4wOC40NyAwIC41OS0uMjJsMS45Mi0zLjMyYy4xMi0uMjIuMDctLjQ3LS4xMi0uNjFsLTIuMDEtMS41OE0xMiAxNS42Yy0xLjk4IDAtMy42LTEuNjItMy42LTMuNnMxLjYyLTMuNiAzLjYtMy42IDMuNiAxLjYyIDMuNiAzLjYtMS42MiAzLjYtMy42IDMuNnoiIGZpbGw9IiMzMzMiLz48L3N2Zz4='
     };
@@ -430,29 +421,25 @@
         document.body.appendChild(toolbar);
     };
 
-    const buildToolbar = (text, mode = 'text') => {
+    const buildToolbar = text => {
         if (!toolbar) initToolbar();
         toolbar.innerHTML = '';
         const frag = document.createDocumentFragment();
-        let btns = [];
+        const btns = [];
 
-        if (mode === 'image') {
-            btns.push({ icon: ICONS.save, text: '保存', handler: () => { downloadImage(text); getSelection().empty(); hideToolbar(); } });
+        const isDomain = UrlUtils.isDomain(text);
+        if (isDomain) btns.push({ icon: ICONS.openLink, text: '打开', handler: () => { open(UrlUtils.makeUrl(text)); getSelection().empty(); hideToolbar(); } });
+
+        const copyBtn = { icon: ICONS.copy, text: '复制', handler: () => { copyText(text); getSelection().empty(); hideToolbar(); } };
+        if (highlightEnabled) {
+            const highlightBtn = { icon: ICONS.highlight, text: '高亮', handler: () => { const kw = getSelection().toString().trim(); if (kw) addDynamicHighlight(kw); hideToolbar(); } };
+            buttonOrder === 'highlight-first' ? btns.push(highlightBtn, copyBtn) : btns.push(copyBtn, highlightBtn);
         } else {
-            const isDomain = UrlUtils.isDomain(text);
-            if (isDomain) btns.push({ icon: ICONS.openLink, text: '打开', handler: () => { open(UrlUtils.makeUrl(text)); getSelection().empty(); hideToolbar(); } });
-
-            const copyBtn = { icon: ICONS.copy, text: '复制', handler: () => { copyText(text); getSelection().empty(); hideToolbar(); } };
-            if (highlightEnabled) {
-                const highlightBtn = { icon: ICONS.highlight, text: '高亮', handler: () => { const kw = getSelection().toString().trim(); if (kw) addDynamicHighlight(kw); hideToolbar(); } };
-                buttonOrder === 'highlight-first' ? btns.push(highlightBtn, copyBtn) : btns.push(copyBtn, highlightBtn);
-            } else {
-                btns.push(copyBtn);
-            }
-
-            getEnabledEngines().forEach(e => btns.push({ icon: e.icon, text: e.name, noIcon: !showEngineIcons, handler: () => { open(e.url.replace(/%s|\{keyword\}|\{searchTerms\}|\$\{searchTerms\}|\{query\}|%KEYWORD%/i, encodeURIComponent(text))); getSelection().empty(); hideToolbar(); } }));
-            btns.push({ icon: ICONS.settings, text: '', title: '设置', alwaysShowIcon: true, handler: showSettingsPanel });
+            btns.push(copyBtn);
         }
+
+        getEnabledEngines().forEach(e => btns.push({ icon: e.icon, text: e.name, noIcon: !showEngineIcons, handler: () => { open(e.url.replace(/%s|\{keyword\}|\{searchTerms\}|\$\{searchTerms\}|\{query\}|%KEYWORD%/i, encodeURIComponent(text))); getSelection().empty(); hideToolbar(); } }));
+        btns.push({ icon: ICONS.settings, text: '', title: '设置', alwaysShowIcon: true, handler: showSettingsPanel });
 
         btns.forEach((btn, i) => {
             if (i > 0) {
@@ -493,20 +480,18 @@
     };
 
     // ==================== 显示/隐藏工具栏 ====================
-    const showToolbar = (x, y, text, mode = 'text') => {
+    const showToolbar = (x, y, text) => {
         if (hideTimeout) clearTimeout(hideTimeout);
         requestAnimationFrame(() => {
-            buildToolbar(text, mode);
+            buildToolbar(text);
             toolbar.style.display = 'flex';
             toolbar.offsetHeight;
             const toolW = toolbar.offsetWidth, toolH = toolbar.offsetHeight;
             let left = x + 6, top = y + 10;
-            if (mode === 'text') {
-                const firstBtn = toolbar.querySelector('button');
-                if (firstBtn) {
-                    left += firstBtn.offsetWidth * -CONFIG.OFFSET_LEFT_ICON_COUNT;
-                    top += firstBtn.offsetHeight * CONFIG.OFFSET_DOWN_ICON_COUNT;
-                }
+            const firstBtn = toolbar.querySelector('button');
+            if (firstBtn) {
+                left += firstBtn.offsetWidth * -CONFIG.OFFSET_LEFT_ICON_COUNT;
+                top += firstBtn.offsetHeight * CONFIG.OFFSET_DOWN_ICON_COUNT;
             }
             if (left + toolW > innerWidth) left = innerWidth - toolW - 6;
             if (top + toolH > innerHeight) top = y - toolH - 6;
@@ -524,147 +509,13 @@
 
     // ==================== URL工具 ====================
     const UrlUtils = {
-        linkCache: new WeakMap(),
         isDomain: t => t && !t.includes(' ') && (/^https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+$/.test(t) || (/^[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+$/.test(t) && t.includes('.') && t.split('.').pop().length >= 2)),
         makeUrl: d => d.startsWith('http') ? d : 'https://' + d,
-        isInsideEditable: el => el?.closest('input, textarea, [contenteditable="true"], [contenteditable=""]') !== null,
-        isLinkElement(el) {
-            if (!el) return false;
-            if (this.linkCache.has(el)) return this.linkCache.get(el);
-            const a = el.closest('a[href]');
-            this.linkCache.set(el, !!a);
-            return !!a;
-        },
-        getLinkUrl: el => el?.closest('a[href]')?.href || null,
-        isImageElement: el => el?.tagName === 'IMG',
-        getImageUrl: el => el?.tagName === 'IMG' ? el.src : null
-    };
-
-    // ==================== 代理与下载 ====================
-    async function fetchWithProxy(url, headers) {
-        try {
-            const res = await fetch(url, { mode: 'cors', credentials: 'omit', headers });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return await res.blob();
-        } catch (e) {
-            console.warn('fetch失败，尝试代理', e);
-            if (!CONFIG.PROXY_URL) throw e;
-            const res = await fetch(CONFIG.PROXY_URL + url, { mode: 'cors', credentials: 'omit', headers });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return await res.blob();
-        }
-    }
-
-    async function downloadImage(url) {
-        const ext = url.match(/\.([a-zA-Z0-9]+)(?:[?#]|$)/)?.[1] || 'jpg';
-        const fileName = getFormattedDateTime() + '.' + ext;
-        const headers = {
-            Accept: 'image/webp,image/apng,image/*,*/*;q=0.8',
-            Referer: location.origin,
-            Origin: location.origin,
-            'User-Agent': navigator.userAgent
-        };
-
-        if (window.showSaveFilePicker) {
-            try {
-                const blob = await fetchWithProxy(url, headers);
-                const handle = await window.showSaveFilePicker({
-                    suggestedName: fileName,
-                    types: [{ description: 'Image', accept: { [blob.type]: ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'] } }]
-                });
-                const writable = await handle.createWritable();
-                await writable.write(blob);
-                await writable.close();
-                console.log(`✅ 已保存 ${fileName}`);
-                return;
-            } catch (err) { if (err.name !== 'AbortError') console.warn('保存失败', err); }
-        }
-
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        console.log(`🔄 尝试下载 ${fileName}`);
-        setTimeout(() => {
-            console.log(`💡 手动保存：${url}`);
-            if (CONFIG.OPEN_WINDOW_AS_FALLBACK) open(url);
-        }, 500);
-    }
-
-    // ==================== 拖拽 ====================
-    const DRAG_THRESHOLD = 5;
-    let dragStartX, dragStartY, dragListening = false, dragTriggered = false, dragMode, dragUrl, rafId;
-
-    const startDragListening = e => {
-        if (e.button !== 0 || toolbar?.contains(e.target) || UrlUtils.isInsideEditable(e.target)) return;
-        if (UrlUtils.isLinkElement(e.target)) {
-            dragMode = 'link';
-            dragUrl = UrlUtils.getLinkUrl(e.target);
-            if (!dragUrl) return;
-        } else if (UrlUtils.isImageElement(e.target)) {
-            dragMode = 'image';
-            dragUrl = UrlUtils.getImageUrl(e.target);
-            if (!dragUrl) return;
-        } else {
-            const sel = getSelection();
-            const text = sel.toString().trim();
-            if (!text) return;
-            if (sel.rangeCount > 0) {
-                const rect = sel.getRangeAt(0).getBoundingClientRect();
-                if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
-            }
-            dragMode = 'search';
-            dragUrl = null;
-        }
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
-        dragListening = true;
-        dragTriggered = false;
-        document.addEventListener('mousemove', onDragMoveThrottled, { passive: true });
-        document.addEventListener('mouseup', onDragEnd);
-    };
-
-    const onDragMoveThrottled = e => {
-        if (!dragListening || dragTriggered) return;
-        if (rafId) cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(() => {
-            if (Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY) >= DRAG_THRESHOLD) {
-                e.preventDefault?.();
-                e.stopPropagation?.();
-                dragTriggered = true;
-                dragListening = false;
-                cleanupDragListeners();
-                hideToolbar();
-                if (dragMode === 'link' && dragUrl) open(dragUrl);
-                else if (dragMode === 'image' && dragUrl) downloadImage(dragUrl);
-                else if (dragMode === 'search') {
-                    const sel = getSelection().toString().trim();
-                    if (sel) {
-                        open(UrlUtils.isDomain(sel) ? UrlUtils.makeUrl(sel) : 'https://www.baidu.com/s?wd=' + encodeURIComponent(sel));
-                        getSelection().empty();
-                    }
-                }
-                dragTriggered = false;
-                dragMode = dragUrl = null;
-            }
-            rafId = null;
-        });
-    };
-
-    const onDragEnd = () => { cleanupDragListeners(); dragTriggered = false; dragMode = dragUrl = null; };
-    const cleanupDragListeners = () => {
-        dragListening = false;
-        document.removeEventListener('mousemove', onDragMoveThrottled);
-        document.removeEventListener('mouseup', onDragEnd);
-        if (rafId) cancelAnimationFrame(rafId);
+        isInsideEditable: el => el?.closest('input, textarea, [contenteditable="true"], [contenteditable=""]') !== null
     };
 
     // ==================== 事件监听 ====================
     const initEventListeners = () => {
-        addEventListener('mousedown', startDragListening, { passive: true });
         addEventListener('mouseup', onMouseUp);
         addEventListener('mousedown', onDocumentMouseDown, { passive: true });
         addEventListener('scroll', hideToolbar, { passive: true });
@@ -672,11 +523,10 @@
     };
 
     const onMouseUp = e => {
-        if (dragTriggered) { dragTriggered = false; dragMode = dragUrl = null; return; }
         const text = getSelection().toString().trim();
         if (!text) { hideToolbar(); return; }
         if (toolbar?.contains(e.target) || UrlUtils.isInsideEditable(e.target)) { hideToolbar(); return; }
-        showToolbar(e.clientX, e.clientY, text, 'text');
+        showToolbar(e.clientX, e.clientY, text);
     };
     const onDocumentMouseDown = e => { if (toolbar && !toolbar.contains(e.target)) hideToolbar(); };
     const onSelectionChange = () => {
