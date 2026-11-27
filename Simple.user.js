@@ -53,7 +53,7 @@
     const ALL_SEARCH_ENGINES = [
         { name: 'G', icon: ENGINE_ICONS.google, url: 'https://www.google.com/search?q=%s' },
         { name: '百度', icon: ENGINE_ICONS.baidu, url: 'https://www.baidu.com/s?wd=%s&ie=utf-8' },
-        { name: '百科', icon: ENGINE_ICONS.baike || ENGINE_ICONS.baidu, url: 'https://baike.baidu.com/item/%s' },
+        // { name: '百科', icon: ENGINE_ICONS.baike || ENGINE_ICONS.baidu, url: 'https://baike.baidu.com/item/%s' },
         { name: '维基', icon: ENGINE_ICONS.wiki, url: 'https://zh.wikipedia.org/w/index.php?search=%s' },
         { name: '豆瓣', icon: ENGINE_ICONS.douban, url: 'https://www.douban.com/search?q=%s' },
         { name: '翻译', icon: ENGINE_ICONS.fanyi || ENGINE_ICONS.baidu, url: 'https://fanyi.baidu.com/#auto/auto/%s' },
@@ -61,8 +61,8 @@
         { name: '抖音', icon: ENGINE_ICONS.douyin, url: 'https://www.douyin.com/search/%s' },
         { name: '京东码', icon: ENGINE_ICONS.jd, url: 'https://item.jd.com/%s.html' },
         { name: '京东搜', icon: ENGINE_ICONS.jd, url: 'https://search.jd.com/Search?keyword=%s' },
-        { name: '高德地图', icon: ENGINE_ICONS.amap, url: 'https://www.amap.com/search?query=%s' },
-        { name: '百度地图', icon: ENGINE_ICONS.baiduMap || ENGINE_ICONS.baidu, url: 'https://map.baidu.com/search/?querytype=s&wd=%s' }
+        { name: '高德', icon: ENGINE_ICONS.amap, url: 'https://www.amap.com/search?query=%s' },
+        { name: '地图', icon: ENGINE_ICONS.baiduMap || ENGINE_ICONS.baidu, url: 'https://map.baidu.com/search/?querytype=s&wd=%s' }
     ];
 
     // 从全局存储加载配置
